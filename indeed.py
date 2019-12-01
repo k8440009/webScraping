@@ -33,5 +33,14 @@ def extract_indeed_jobs(last_page):
     for result in results:
         title = result.find("div", {"class": "title"}).find("a")[
             "title"]   # 제목 추출
-        print(title)
+        company = result.find("span", {"class": "company"})
+        company_anchor = company.find("a")
+        # 회사 링크가 없는 경우
+        if company_anchor is not None:
+            company = str(company_anchor.string)
+        # 링크가 있는 경우
+        else:
+            company = str(company.string)
+        company = company.strip()
+        print(company)
     return jobs
