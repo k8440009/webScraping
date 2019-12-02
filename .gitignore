@@ -8,7 +8,7 @@ static
 build
 /build
 .txt
-
+/__pycache__
 # Logs
 logs
 *.log
