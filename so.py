@@ -14,14 +14,35 @@ def get_last_page():
     return int(last_page)
 
 
+def extract_job(html):
+    title = html.find("div", {"class": "-title"}).find("h2").find("a")["title"]
+    company, location = html.find(
+        "div", {"class": "-company"}).find_all("span", recursive=False)  # 깊숙히 있는 것들 가져오기 방지, 첫번째 단계 span만 가져온다
+    company = company.get_text(strip=True)
+    # 개행 : " \r" , "\n" 제거
+    location = location.get_text(strip=True).strip(
+        "-").strip(" \r").strip("\n")
+    #print(company, location)
+    job_id = html['data-jobid']
+    return {
+        'title': title,
+        'company': company,
+        'location': location,
+        'apply_link': f"https://stackoverflow.com/jobs/{job_id}"
+    }
+
+
 def extract_jobs(last_page):
     jobs = []
     for page in range(last_page):
+        print(f"Stackoverflow scrapping page {page}")
         result = requests.get(f"{URL}&pg={page + 1}")
         soup = BeautifulSoup(result.text, "html.parser")
         results = soup.find_all("div", {"class": "-job"})
         for result in results:
-            print(result["data-jobid"])
+            job = extract_job(result)
+            jobs.append(job)
+    return jobs
 
 
 def get_jobs():
